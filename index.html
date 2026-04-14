@@ -7,16 +7,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --gd: #1B5E20; --gm: #388E3C; --gl: #81C784; --gp: #E8F5E9;
-  --ink: #1A1A1A; --ink2: #555; --ink3: #999;
-  --bg: #FAFAF8; --bg2: #F2F0EB; --bd: #E0DDD6;
-  --red: #B71C1C; --redbg: #FFEBEE;
-  --blue: #1565C0; --bluebg: #E3F2FD;
-  --mono: 'DM Mono', monospace; --sans: 'Noto Sans KR', sans-serif;
+:root{
+  --gd:#1B5E20;--gm:#388E3C;--gl:#81C784;--gp:#E8F5E9;
+  --ink:#1A1A1A;--ink2:#555;--ink3:#999;
+  --bg:#FAFAF8;--bg2:#F2F0EB;--bd:#E0DDD6;
+  --red:#B71C1C;--redbg:#FFEBEE;
+  --blue:#1565C0;--bluebg:#E3F2FD;
+  --amber:#F57F17;--amberbg:#FFF8E1;
+  --mono:'DM Mono',monospace;--sans:'Noto Sans KR',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+
+/* HEADER */
 .hd{background:var(--gd);color:#fff;padding:16px 20px 12px;position:sticky;top:0;z-index:100}
 .hd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .logo{font-family:var(--mono);font-size:10px;letter-spacing:.12em;opacity:.65}
@@ -30,32 +33,63 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .sdot.syncing{background:#FFD54F;animation:pulse 1s infinite}
 .sdot.error{background:#EF9A9A}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TABS */
 .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:1;min-width:56px;padding:10px 0;font-size:12px;font-weight:500;color:var(--ink2);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
+.tab{flex:1;min-width:52px;padding:10px 0;font-size:12px;font-weight:500;color:var(--ink2);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s}
 .tab.active{color:var(--gd);border-bottom-color:var(--gd)}
+
+/* MAIN */
 .main{padding:14px;max-width:600px;margin:0 auto}
 .pane{display:none}.pane.active{display:block}
 .sec{margin-bottom:20px}
 .sec-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:7px;padding-left:2px}
-.item{display:flex;align-items:center;gap:11px;padding:12px 13px;background:#fff;border:1px solid var(--bd);border-radius:10px;margin-bottom:5px;cursor:pointer;transition:all .15s;user-select:none;-webkit-user-select:none}
-.item:active{transform:scale(.985);background:var(--bg2)}
+
+/* ITEM */
+.item{background:#fff;border:1px solid var(--bd);border-radius:10px;margin-bottom:5px;transition:all .15s}
 .item.done{opacity:.42}
 .item.done .itxt{text-decoration:line-through}
+.item-main{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.item-main:active{background:var(--bg2);border-radius:10px}
 .ring{width:21px;height:21px;border-radius:50%;border:1.5px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
 .ring.ck{background:var(--gm);border-color:var(--gm)}
 .ring svg{display:none}.ring.ck svg{display:block}
 .ibody{flex:1;min-width:0}
-.itxt{font-size:14px;color:var(--ink)}
-.isub{font-size:11px;color:var(--ink3);margin-top:2px}
-.badge{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.itxt{font-size:14px;color:var(--ink);line-height:1.3}
+.isub{font-size:11px;color:var(--ink3);margin-top:2px;display:flex;align-items:center;gap:5px}
+.memo-dot{width:5px;height:5px;border-radius:50%;background:var(--amber);display:inline-block}
+.badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:20px;flex-shrink:0;white-space:nowrap}
 .bt{background:var(--bluebg);color:var(--blue)}
 .bu{background:var(--redbg);color:var(--red)}
-.del{background:none;border:none;color:var(--ink3);font-size:17px;cursor:pointer;padding:3px 5px;border-radius:5px;flex-shrink:0;opacity:0;transition:opacity .15s}
-.item:hover .del{opacity:1}
-@media(hover:none){.del{opacity:.3}}
+
+/* ITEM ACTIONS */
+.item-actions{display:flex;align-items:center;gap:4px;padding:0 10px 9px 10px;flex-wrap:wrap}
+.act-btn{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--bd);background:var(--bg2);color:var(--ink2);cursor:pointer;font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.act-btn:hover{border-color:var(--gm);color:var(--gd)}
+.act-btn.postpone{border-color:var(--amber);color:var(--amber);background:var(--amberbg)}
+.act-btn.del-act{border-color:#ddd;color:var(--ink3)}
+.act-btn.del-act:hover{border-color:var(--red);color:var(--red)}
+.item-expanded .item-actions{display:flex}
+
+/* MEMO PANEL */
+.memo-panel{border-top:1px solid var(--bd);padding:10px 12px}
+.memo-ta{width:100%;border:1px solid var(--bd);border-radius:8px;padding:9px 11px;font-size:13px;font-family:var(--sans);color:var(--ink);background:var(--bg);resize:none;outline:none;min-height:70px;line-height:1.6}
+.memo-ta:focus{border-color:var(--gm)}
+.memo-save{margin-top:6px;padding:7px 16px;background:var(--gd);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer}
+
+/* DATE MOVE PANEL */
+.move-panel{border-top:1px solid var(--bd);padding:10px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.move-panel label{font-size:12px;color:var(--ink2)}
+.move-panel input{border:1px solid var(--bd);border-radius:7px;padding:6px 10px;font-size:13px;font-family:var(--sans);background:var(--bg);color:var(--ink);outline:none}
+.move-panel input:focus{border-color:var(--gm)}
+.move-btn{padding:7px 14px;background:var(--gd);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer}
+
+/* FAB */
 .fab{position:fixed;bottom:22px;right:18px;width:50px;height:50px;border-radius:50%;background:var(--gd);color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;transition:transform .15s;z-index:200}
 .fab:active{transform:scale(.92)}
+
+/* OVERLAY / MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
 .modal{background:#fff;border-radius:20px 20px 0 0;padding:18px 18px 34px;width:100%;max-width:600px;animation:up .25s ease}
@@ -65,20 +99,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .modal input,.modal select{width:100%;border:1px solid var(--bd);border-radius:9px;padding:11px 13px;font-size:14px;font-family:var(--sans);background:var(--bg);color:var(--ink);margin-bottom:9px;outline:none}
 .modal input:focus,.modal select:focus{border-color:var(--gm)}
 .mrow{display:flex;gap:8px}
-.mrow input{flex:1}
 .mbtn{width:100%;padding:13px;background:var(--gd);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;margin-top:3px}
 .mbtn:active{opacity:.85}
+
+/* SETUP */
 .setup{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
 .setup-card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:26px 22px;width:100%;max-width:400px}
 .setup-card h2{font-size:17px;font-weight:700;margin-bottom:7px}
 .setup-card p{font-size:13px;color:var(--ink2);margin-bottom:18px;line-height:1.6}
 .setup-card input{width:100%;border:1px solid var(--bd);border-radius:9px;padding:11px 13px;font-size:13px;font-family:var(--mono);background:var(--bg);color:var(--ink);margin-bottom:11px;outline:none}
 .setup-card input:focus{border-color:var(--gm)}
+
+/* STATS */
 .sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:18px}
 .scard{background:#fff;border:1px solid var(--bd);border-radius:11px;padding:13px 10px;text-align:center}
 .snum{font-family:var(--mono);font-size:24px;font-weight:500}
 .snum.g{color:var(--gm)}.snum.r{color:var(--red)}
 .slbl{font-size:10px;color:var(--ink3);margin-top:2px}
+
+/* CALENDAR */
 .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .cal-nav button{background:none;border:1px solid var(--bd);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--ink)}
 .cal-title{font-size:15px;font-weight:500}
@@ -93,6 +132,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .cal-dot{width:4px;height:4px;border-radius:50%;background:var(--gm);position:absolute;bottom:3px}
 .cal-day.today .cal-dot{background:var(--gl)}
 .cal-sel-lbl{font-size:13px;font-weight:500;margin-bottom:10px;color:var(--gd)}
+
+/* MOVE MODE */
+.move-mode-bar{background:var(--amberbg);border:1px solid var(--amber);border-radius:9px;padding:10px 13px;margin-bottom:12px;display:none;align-items:center;justify-content:space-between;gap:8px}
+.move-mode-bar.active{display:flex}
+.move-mode-txt{font-size:13px;color:var(--amber)}
+.move-mode-cancel{background:none;border:1px solid var(--amber);border-radius:7px;padding:5px 12px;font-size:12px;color:var(--amber);cursor:pointer;font-family:var(--sans)}
+
+/* WEEK */
 .week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .week-nav button{background:none;border:1px solid var(--bd);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--ink)}
 .week-lbl{font-size:14px;font-weight:500}
@@ -112,6 +159,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .goal-ta{width:100%;border:1px solid var(--bd);border-radius:8px;padding:10px 12px;font-size:13px;font-family:var(--sans);color:var(--ink);background:var(--bg);resize:none;outline:none;min-height:90px;line-height:1.6}
 .goal-ta:focus{border-color:var(--gm)}
 .save-btn{margin-top:7px;padding:9px 18px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer}
+
+/* MEMO TAB */
+.memo-item{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:13px 14px;margin-bottom:8px}
+.memo-item-title{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:5px}
+.memo-item-date{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:6px}
+.memo-item-content{font-size:13px;color:var(--ink2);line-height:1.6;white-space:pre-wrap}
+
 .empty{text-align:center;padding:30px 20px;color:var(--ink3);font-size:13px}
 </style>
 </head>
@@ -144,13 +198,21 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
   <button class="tab" onclick="go('cal')">캘린더</button>
   <button class="tab" onclick="go('week')">주간</button>
   <button class="tab" onclick="go('month')">월간</button>
+  <button class="tab" onclick="go('memo')">메모</button>
   <button class="tab" onclick="go('stats')">현황</button>
 </div>
 
 <div class="main">
+
+  <!-- TODAY -->
   <div class="pane active" id="pane-today"><div id="today-list"></div></div>
 
+  <!-- CALENDAR -->
   <div class="pane" id="pane-cal">
+    <div class="move-mode-bar" id="move-mode-bar">
+      <span class="move-mode-txt" id="move-mode-txt"></span>
+      <button class="move-mode-cancel" onclick="cancelMove()">취소</button>
+    </div>
     <div class="cal-nav">
       <button onclick="calMove(-1)">◀</button>
       <span class="cal-title" id="cal-title"></span>
@@ -161,6 +223,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     <div id="cal-items"></div>
   </div>
 
+  <!-- WEEK -->
   <div class="pane" id="pane-week">
     <div class="week-nav">
       <button onclick="weekMove(-1)">◀</button>
@@ -177,6 +240,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     <div id="week-day-items"></div>
   </div>
 
+  <!-- MONTH -->
   <div class="pane" id="pane-month">
     <div class="cal-nav">
       <button onclick="monthMove(-1)">◀</button>
@@ -194,6 +258,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     </div>
   </div>
 
+  <!-- MEMO -->
+  <div class="pane" id="pane-memo">
+    <div class="sec-lbl" style="margin-bottom:10px">메모가 있는 항목</div>
+    <div id="memo-list"></div>
+  </div>
+
+  <!-- STATS -->
   <div class="pane" id="pane-stats">
     <div class="sgrid">
       <div class="scard"><div class="snum" id="st-tot">0</div><div class="slbl">전체</div></div>
@@ -203,10 +274,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     <div class="sec"><div class="sec-lbl">오늘 완료</div><div id="done-list"></div></div>
     <div class="sec"><div class="sec-lbl">미완료</div><div id="left-list"></div></div>
   </div>
+
 </div>
 
 <button class="fab" onclick="openModal()">+</button>
 
+<!-- ADD MODAL -->
 <div class="overlay" id="modal" onclick="closeOut(event)">
   <div class="modal">
     <div class="mhandle"></div>
@@ -236,14 +309,16 @@ const TOKEN_KEY='gd-gh-token';
 const TODAY=new Date().toISOString().slice(0,10);
 const DAYS=['일','월','화','수','목','금','토'];
 
+function tomorrow(){const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().slice(0,10);}
+
 const SEED=[
-  {id:'s1',text:'김유연 답장',category:'커뮤니케이션',priority:'urgent',time:'',done:false,date:TODAY},
-  {id:'s2',text:'권일환 대표 카톡',category:'커뮤니케이션',priority:'urgent',time:'',done:false,date:TODAY},
-  {id:'s3',text:'가격전략정책 고도화',category:'비즈니스',priority:'normal',time:'',done:false,date:TODAY},
-  {id:'s4',text:'여기어때 프로모션 확인',category:'비즈니스',priority:'normal',time:'',done:false,date:TODAY},
-  {id:'s5',text:'블루타이거 미팅',category:'미팅',priority:'urgent',time:'15:00',done:false,date:TODAY},
-  {id:'s6',text:'4/15 릴스 3개 제작',category:'콘텐츠',priority:'normal',time:'',done:false,date:TODAY},
-  {id:'s7',text:'4/16 인스타 대행 미리작업',category:'콘텐츠',priority:'low',time:'',done:false,date:TODAY},
+  {id:'s1',text:'김유연 답장',category:'커뮤니케이션',priority:'urgent',time:'',done:false,date:TODAY,memo:''},
+  {id:'s2',text:'권일환 대표 카톡',category:'커뮤니케이션',priority:'urgent',time:'',done:false,date:TODAY,memo:''},
+  {id:'s3',text:'가격전략정책 고도화',category:'비즈니스',priority:'normal',time:'',done:false,date:TODAY,memo:''},
+  {id:'s4',text:'여기어때 프로모션 확인',category:'비즈니스',priority:'normal',time:'',done:false,date:TODAY,memo:''},
+  {id:'s5',text:'블루타이거 미팅',category:'미팅',priority:'urgent',time:'15:00',done:false,date:TODAY,memo:''},
+  {id:'s6',text:'4/15 릴스 3개 제작',category:'콘텐츠',priority:'normal',time:'',done:false,date:TODAY,memo:''},
+  {id:'s7',text:'4/16 인스타 대행 미리작업',category:'콘텐츠',priority:'low',time:'',done:false,date:TODAY,memo:''},
 ];
 
 let DB={items:[],goals:{}};
@@ -251,6 +326,8 @@ let syncT=null;
 let calYear,calMonth,selCalDate=TODAY;
 let weekOffset=0,selWeekDay=TODAY;
 let monthYear,monthMonth;
+let expandedId=null; // which item is expanded
+let moveItemId=null; // item being moved via calendar
 
 const nd=new Date();
 calYear=nd.getFullYear();calMonth=nd.getMonth();
@@ -258,6 +335,7 @@ monthYear=nd.getFullYear();monthMonth=nd.getMonth();
 
 document.getElementById('date-disp').textContent=`${nd.getMonth()+1}/${nd.getDate()}(${DAYS[nd.getDay()]})`;
 
+// ── TOKEN ──
 function getToken(){return localStorage.getItem(TOKEN_KEY);}
 function saveToken(){
   const t=document.getElementById('tok-in').value.trim();
@@ -267,6 +345,7 @@ function saveToken(){
   init();
 }
 
+// ── SYNC ──
 function setSS(state,msg){
   document.getElementById('sdot').className='sdot'+(state==='syncing'?' syncing':state==='error'?' error':'');
   document.getElementById('slbl').textContent=msg;
@@ -284,15 +363,20 @@ async function loadGist(){
     if(content){
       const p=JSON.parse(content);
       if(!p.items||p.items.length===0){DB={items:SEED,goals:{}};await saveGist();}
-      else{DB=p;if(!DB.goals)DB.goals={};}
+      else{
+        DB=p;
+        if(!DB.goals)DB.goals={};
+        // ensure memo field exists
+        DB.items.forEach(i=>{if(i.memo===undefined)i.memo='';});
+      }
     }
-    setSS('ok','동기화 완료');
-    renderAll();
+    setSS('ok','동기화 완료');renderAll();
   }catch{
     setSS('error','동기화 실패');
     const local=localStorage.getItem('gd-local');
     DB=local?JSON.parse(local):{items:SEED,goals:{}};
     if(!DB.goals)DB.goals={};
+    DB.items.forEach(i=>{if(i.memo===undefined)i.memo='';});
     renderAll();
   }
 }
@@ -318,19 +402,62 @@ function init(){
   loadGist();
 }
 
+// ── TABS ──
 function go(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['today','cal','week','month','stats'][i]===tab));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['today','cal','week','month','memo','stats'][i]===tab));
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+tab).classList.add('active');
+  expandedId=null;
   if(tab==='today')renderToday();
   else if(tab==='cal')renderCal();
   else if(tab==='week')renderWeek();
   else if(tab==='month')renderMonth();
+  else if(tab==='memo')renderMemoTab();
   else if(tab==='stats')renderStats();
 }
 
 function renderAll(){renderToday();renderProgress();}
 
+// ── ITEM HTML ──
+function itemHTML(item, showDate=false){
+  const isExp=expandedId===item.id;
+  const timeBadge=item.time?`<span class="badge bt">${item.time}</span>`:'';
+  const urgBadge=item.priority==='urgent'&&!item.time?`<span class="badge bu">긴급</span>`:'';
+  const memoDot=item.memo?`<span class="memo-dot"></span>`:'';
+  const dateSub=showDate?`<span>${item.date}</span>`:'';
+
+  let html=`<div class="item${item.done?' done':''}" id="item-${item.id}">
+    <div class="item-main" onclick="toggleExpand('${item.id}')">
+      <div class="ring${item.done?' ck':''}" onclick="toggle(event,'${item.id}')">
+        <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><polyline points="1,4.5 4,7.5 10,1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="ibody">
+        <div class="itxt">${item.text}</div>
+        <div class="isub">${memoDot}${dateSub}</div>
+      </div>
+      ${timeBadge}${urgBadge}
+    </div>`;
+
+  if(isExp){
+    // memo panel
+    html+=`<div class="memo-panel">
+      <textarea class="memo-ta" id="memo-${item.id}" placeholder="메모를 입력하세요...">${item.memo||''}</textarea>
+      <button class="memo-save" onclick="saveMemo('${item.id}')">메모 저장</button>
+    </div>`;
+    // actions
+    const tmr=tomorrow();
+    html+=`<div class="item-actions">
+      <button class="act-btn postpone" onclick="postpone('${item.id}')">→ 내일로 미루기</button>
+      <button class="act-btn" onclick="startMove('${item.id}')">📅 날짜 이동</button>
+      <button class="act-btn del-act" onclick="del('${item.id}')">삭제</button>
+    </div>`;
+  }
+
+  html+='</div>';
+  return html;
+}
+
+// ── TODAY ──
 function renderToday(){
   const items=DB.items.filter(i=>i.date===TODAY);
   const cats=[...new Set(items.map(i=>i.category))];
@@ -339,25 +466,11 @@ function renderToday(){
   let h='';
   cats.forEach(c=>{
     h+=`<div class="sec"><div class="sec-lbl">${c}</div>`;
-    items.filter(i=>i.category===c).forEach(i=>{
-      h+=itemHTML(i,i.time?`<span class="badge bt">${i.time}</span>`:i.priority==='urgent'?`<span class="badge bu">긴급</span>`:'');
-    });
+    items.filter(i=>i.category===c).forEach(i=>{h+=itemHTML(i);});
     h+='</div>';
   });
   el.innerHTML=h;
   renderProgress();
-}
-
-function itemHTML(i,badge=''){
-  return`<div class="item${i.done?' done':''}" onclick="toggle('${i.id}')">
-    <div class="ring${i.done?' ck':''}"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><polyline points="1,4.5 4,7.5 10,1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="ibody">
-      <div class="itxt">${i.text}</div>
-      ${i.date!==TODAY?`<div class="isub">${i.date}</div>`:''}
-    </div>
-    ${badge}
-    <button class="del" onclick="del(event,'${i.id}')">×</button>
-  </div>`;
 }
 
 function renderProgress(){
@@ -367,7 +480,63 @@ function renderProgress(){
   document.getElementById('prog-txt').textContent=pct+'%';
 }
 
-// CALENDAR
+// ── EXPAND / MEMO ──
+function toggleExpand(id){
+  expandedId=expandedId===id?null:id;
+  refreshCurrent();
+}
+
+function saveMemo(id){
+  const item=DB.items.find(x=>x.id===id);
+  if(!item)return;
+  item.memo=document.getElementById('memo-'+id).value;
+  debSave();
+  setSS('ok','메모 저장됨');
+  // re-render to show dot
+  refreshCurrent();
+}
+
+// ── ACTIONS ──
+function toggle(e,id){
+  e.stopPropagation();
+  const item=DB.items.find(x=>x.id===id);
+  if(item){item.done=!item.done;refreshCurrent();debSave();}
+}
+
+function postpone(id){
+  const item=DB.items.find(x=>x.id===id);
+  if(!item)return;
+  item.date=tomorrow();
+  item.done=false;
+  expandedId=null;
+  refreshCurrent();debSave();
+  setSS('ok','내일로 미뤘습니다');
+}
+
+function del(id){
+  if(!confirm('삭제할까요?'))return;
+  DB.items=DB.items.filter(x=>x.id!==id);
+  expandedId=null;
+  refreshCurrent();debSave();
+}
+
+// ── DATE MOVE via CALENDAR ──
+function startMove(id){
+  moveItemId=id;
+  expandedId=null;
+  go('cal');
+  document.getElementById('move-mode-bar').classList.add('active');
+  const item=DB.items.find(x=>x.id===id);
+  document.getElementById('move-mode-txt').textContent=`"${item.text}" — 이동할 날짜를 선택하세요`;
+}
+
+function cancelMove(){
+  moveItemId=null;
+  document.getElementById('move-mode-bar').classList.remove('active');
+  renderCal();
+}
+
+// ── CALENDAR ──
 function calMove(d){
   calMonth+=d;
   if(calMonth<0){calMonth=11;calYear--;}
@@ -388,7 +557,7 @@ function renderCal(){
     const isT=ds===TODAY,isS=ds===selCalDate;
     const hasDot=DB.items.some(i=>i.date===ds);
     let cls='cal-day'+(isT?' today':'')+(isS&&!isT?' selected':isT&&isS?' today selected':'');
-    h+=`<div class="${cls}" onclick="selCal('${ds}')"><span>${d}</span>${hasDot?'<div class="cal-dot"></div>':''}</div>`;
+    h+=`<div class="${cls}" onclick="calDayClick('${ds}')"><span>${d}</span>${hasDot?'<div class="cal-dot"></div>':''}</div>`;
   }
   const total=first+last;
   const rem=total%7?7-(total%7):0;
@@ -397,10 +566,26 @@ function renderCal(){
   renderCalItems();
 }
 
-function selCal(date){
-  selCalDate=date;
-  const d=new Date(date);calYear=d.getFullYear();calMonth=d.getMonth();
-  renderCal();
+function calDayClick(date){
+  if(moveItemId){
+    // move item to this date
+    const item=DB.items.find(x=>x.id===moveItemId);
+    if(item){
+      item.date=date;
+      item.done=false;
+      setSS('ok',`${date}로 이동했습니다`);
+      debSave();
+    }
+    moveItemId=null;
+    document.getElementById('move-mode-bar').classList.remove('active');
+    selCalDate=date;
+    const d=new Date(date);calYear=d.getFullYear();calMonth=d.getMonth();
+    renderCal();
+  } else {
+    selCalDate=date;
+    const d=new Date(date);calYear=d.getFullYear();calMonth=d.getMonth();
+    renderCal();
+  }
 }
 
 function renderCalItems(){
@@ -409,14 +594,12 @@ function renderCalItems(){
   const items=DB.items.filter(i=>i.date===selCalDate);
   const el=document.getElementById('cal-items');
   if(!items.length){el.innerHTML=`<div class="empty" style="padding:18px">이 날 일정이 없습니다</div>`;return;}
-  el.innerHTML=items.map(i=>itemHTML(i,i.time?`<span class="badge bt">${i.time}</span>`:'')).join('');
+  el.innerHTML=items.map(i=>itemHTML(i)).join('');
 }
 
-// WEEK
+// ── WEEK ──
 function toDS(d){return d.toISOString().slice(0,10);}
-function getWS(offset){
-  const d=new Date();d.setDate(d.getDate()-d.getDay()+offset*7);d.setHours(0,0,0,0);return d;
-}
+function getWS(offset){const d=new Date();d.setDate(d.getDate()-d.getDay()+offset*7);d.setHours(0,0,0,0);return d;}
 function weekMove(d){weekOffset+=d;renderWeek();}
 
 function renderWeek(){
@@ -451,7 +634,7 @@ function renderWeekDay(){
   const items=DB.items.filter(i=>i.date===selWeekDay);
   const el=document.getElementById('week-day-items');
   if(!items.length){el.innerHTML=`<div class="empty" style="padding:16px">이 날 일정이 없습니다</div>`;return;}
-  el.innerHTML=items.map(i=>itemHTML(i,i.time?`<span class="badge bt">${i.time}</span>`:'')).join('');
+  el.innerHTML=items.map(i=>itemHTML(i)).join('');
 }
 
 function saveWeekGoal(){
@@ -460,7 +643,7 @@ function saveWeekGoal(){
   debSave();setSS('ok','주간 목표 저장됨');
 }
 
-// MONTH
+// ── MONTH ──
 function monthMove(d){
   monthMonth+=d;
   if(monthMonth<0){monthMonth=11;monthYear--;}
@@ -489,7 +672,22 @@ function saveMonthGoal(){
   debSave();setSS('ok','월간 목표 저장됨');
 }
 
-// STATS
+// ── MEMO TAB ──
+function renderMemoTab(){
+  const items=DB.items.filter(i=>i.memo&&i.memo.trim());
+  const el=document.getElementById('memo-list');
+  if(!items.length){el.innerHTML=`<div class="empty">메모가 있는 항목이 없습니다<br><span style="font-size:11px;margin-top:5px;display:block">항목을 클릭하면 메모를 남길 수 있어요</span></div>`;return;}
+  // sort by date desc
+  const sorted=[...items].sort((a,b)=>b.date.localeCompare(a.date));
+  el.innerHTML=sorted.map(i=>`
+    <div class="memo-item">
+      <div class="memo-item-title">${i.text}${i.done?' ✓':''}</div>
+      <div class="memo-item-date">${i.date} · ${i.category}</div>
+      <div class="memo-item-content">${i.memo}</div>
+    </div>`).join('');
+}
+
+// ── STATS ──
 function renderStats(){
   const items=DB.items.filter(i=>i.date===TODAY);
   const done=items.filter(i=>i.done),left=items.filter(i=>!i.done);
@@ -500,32 +698,24 @@ function renderStats(){
   document.getElementById('left-list').innerHTML=left.length?left.map(i=>itemHTML(i)).join(''):`<div class="empty" style="padding:14px">모두 완료!</div>`;
 }
 
-// CRUD
-function toggle(id){
-  const i=DB.items.find(x=>x.id===id);
-  if(i){i.done=!i.done;refreshCurrent();debSave();}
-}
-function del(e,id){
-  e.stopPropagation();
-  DB.items=DB.items.filter(x=>x.id!==id);
-  refreshCurrent();debSave();
-}
+// ── REFRESH CURRENT TAB ──
 function refreshCurrent(){
   const idx=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
-  const tabs=['today','cal','week','month','stats'];
+  const tabs=['today','cal','week','month','memo','stats'];
   const tab=tabs[idx];
   renderProgress();
   if(tab==='today')renderToday();
   else if(tab==='cal')renderCalItems();
   else if(tab==='week')renderWeekDay();
   else if(tab==='month')renderMonth();
+  else if(tab==='memo')renderMemoTab();
   else if(tab==='stats')renderStats();
 }
 
-// MODAL
+// ── MODAL ──
 function openModal(){
   const idx=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
-  const tabs=['today','cal','week','month','stats'];
+  const tabs=['today','cal','week','month','memo','stats'];
   let prefill=TODAY;
   if(tabs[idx]==='cal')prefill=selCalDate;
   else if(tabs[idx]==='week')prefill=selWeekDay;
@@ -547,7 +737,7 @@ function addItem(){
     category:document.getElementById('in-cat').value,
     priority:document.getElementById('in-pri').value,
     time:document.getElementById('in-time').value.trim(),
-    done:false,
+    done:false,memo:'',
     date:document.getElementById('in-date').value||TODAY,
   });
   closeModal();refreshCurrent();debSave();
