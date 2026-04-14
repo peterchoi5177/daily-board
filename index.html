@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Peter's Daily Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1B5E20;
+    --green-mid: #388E3C;
+    --green-light: #81C784;
+    --green-pale: #E8F5E9;
+    --ink: #1A1A1A;
+    --ink-mid: #555;
+    --ink-faint: #999;
+    --surface: #FAFAF8;
+    --surface-2: #F2F0EB;
+    --border: #E0DDD6;
+    --urgent: #B71C1C;
+    --urgent-bg: #FFEBEE;
+    --time-bg: #E3F2FD;
+    --time-fg: #1565C0;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Noto Sans KR', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--surface); color: var(--ink); font-family: var(--sans); min-height: 100vh; }
+
+  .header {
+    background: var(--green-dark); color: white;
+    padding: 20px 20px 16px; position: sticky; top: 0; z-index: 100;
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .logo { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; opacity: 0.7; }
+  .date-str { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; opacity: 0.7; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .prog-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--green-light); border-radius: 2px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+  .prog-text { font-family: var(--mono); font-size: 11px; opacity: 0.8; min-width: 36px; text-align: right; }
+
+  .sync-status {
+    font-family: var(--mono); font-size: 10px; opacity: 0.7;
+    display: flex; align-items: center; gap: 5px; margin-top: 6px;
+  }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-light); }
+  .sync-dot.syncing { background: #FFD54F; animation: pulse 1s infinite; }
+  .sync-dot.error { background: #EF9A9A; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .tabs { display: flex; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .tab { flex: 1; padding: 11px 0; font-size: 13px; font-weight: 500; color: var(--ink-mid); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab.active { color: var(--green-dark); border-bottom-color: var(--green-dark); }
+
+  .main { padding: 16px; max-width: 600px; margin: 0 auto; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  .section { margin-bottom: 22px; }
+  .section-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 8px; padding-left: 2px; }
+
+  .todo-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px; background: white;
+    border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 6px; cursor: pointer;
+    transition: all 0.15s; user-select: none; -webkit-user-select: none;
+  }
+  .todo-item:active { transform: scale(0.985); background: var(--surface-2); }
+  .todo-item.done { opacity: 0.45; }
+  .todo-item.done .todo-text { text-decoration: line-through; }
+
+  .check-ring {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border); background: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s;
+  }
+  .check-ring.checked { background: var(--green-mid); border-color: var(--green-mid); }
+  .check-ring svg { display: none; }
+  .check-ring.checked svg { display: block; }
+
+  .todo-body { flex: 1; min-width: 0; }
+  .todo-text { font-size: 15px; color: var(--ink); }
+
+  .badge { font-family: var(--mono); font-size: 11px; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+  .badge-time { background: var(--time-bg); color: var(--time-fg); }
+  .badge-urgent { background: var(--urgent-bg); color: var(--urgent); }
+
+  .fab {
+    position: fixed; bottom: 24px; right: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--green-dark); color: white;
+    border: none; font-size: 24px; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s; z-index: 200;
+  }
+  .fab:active { transform: scale(0.92); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    z-index: 300; display: none; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 20px 20px 0 0;
+    padding: 20px 20px 36px; width: 100%; max-width: 600px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(60px); opacity: 0; } }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+  .modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+  .modal input, .modal select {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 15px; font-family: var(--sans);
+    background: var(--surface); color: var(--ink); margin-bottom: 10px; outline: none;
+  }
+  .modal input:focus, .modal select:focus { border-color: var(--green-mid); }
+  .modal-row { display: flex; gap: 8px; }
+  .modal-row input { flex: 1; }
+  .btn-add {
+    width: 100%; padding: 14px; background: var(--green-dark); color: white;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: 700;
+    font-family: var(--sans); cursor: pointer; margin-top: 4px;
+  }
+  .btn-add:active { opacity: 0.85; }
+
+  /* Token setup screen */
+  .setup-screen {
+    position: fixed; inset: 0; background: var(--surface);
+    z-index: 500; display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .setup-card {
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    padding: 28px 24px; width: 100%; max-width: 420px;
+  }
+  .setup-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .setup-card p { font-size: 13px; color: var(--ink-mid); margin-bottom: 20px; line-height: 1.6; }
+  .setup-card input {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; font-family: var(--mono);
+    background: var(--surface); color: var(--ink); margin-bottom: 12px; outline: none;
+  }
+  .setup-card input:focus { border-color: var(--green-mid); }
+  .btn-setup {
+    width: 100%; padding: 14px; background: var(--green-dark); color: white;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: 700;
+    font-family: var(--sans); cursor: pointer;
+  }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+  .stat-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 12px; text-align: center; }
+  .stat-num { font-family: var(--mono); font-size: 26px; font-weight: 500; color: var(--ink); }
+  .stat-num.green { color: var(--green-mid); }
+  .stat-num.red { color: var(--urgent); }
+  .stat-lbl { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--ink-faint); font-size: 14px; }
+
+  .del-btn {
+    background: none; border: none; color: var(--ink-faint); font-size: 18px;
+    cursor: pointer; padding: 4px 6px; border-radius: 6px; flex-shrink: 0;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .todo-item:hover .del-btn { opacity: 1; }
+  @media (hover: none) { .del-btn { opacity: 0.35; } }
+
+  .schedule-item { display: flex; gap: 14px; padding: 12px 14px; background: white; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px; }
+  .sch-time { font-family: var(--mono); font-size: 12px; color: var(--green-dark); font-weight: 500; min-width: 42px; padding-top: 1px; }
+  .sch-text { font-size: 14px; color: var(--ink); flex: 1; }
+  .sch-done { text-decoration: line-through; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<!-- Token setup screen -->
+<div class="setup-screen" id="setup-screen" style="display:none">
+  <div class="setup-card">
+    <h2>🔐 GitHub 토큰 설정</h2>
+    <p>모든 기기에서 할 일을 동기화하려면 GitHub Personal Access Token이 필요해요. 토큰은 이 기기에만 저장되며 외부로 전송되지 않아요.</p>
+    <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx" />
+    <button class="btn-setup" onclick="saveToken()">저장하고 시작하기</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-top">
+    <span class="logo">GLAMDOG · INJANG</span>
+    <span class="date-str" id="date-display"></span>
+  </div>
+  <h1>Peter's Daily Board</h1>
+  <div class="progress-row">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <span class="prog-text" id="prog-text">0%</span>
+  </div>
+  <div class="sync-status">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span id="sync-label">동기화 대기 중</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('todo')">할 일</button>
+  <button class="tab" onclick="switchTab('schedule')">일정</button>
+  <button class="tab" onclick="switchTab('stats')">현황</button>
+</div>
+
+<div class="main">
+  <div class="pane active" id="pane-todo"><div id="todo-list"></div></div>
+  <div class="pane" id="pane-schedule"><div id="schedule-list"></div></div>
+  <div class="pane" id="pane-stats">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">전체</div></div>
+      <div class="stat-card"><div class="stat-num green" id="st-done">0</div><div class="stat-lbl">완료</div></div>
+      <div class="stat-card"><div class="stat-num red" id="st-left">0</div><div class="stat-lbl">남은 일</div></div>
+    </div>
+    <div class="section">
+      <div class="section-label">완료한 항목</div>
+      <div id="done-list"></div>
+    </div>
+  </div>
+</div>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>새 항목 추가</h2>
+    <input type="text" id="input-text" placeholder="할 일 또는 일정 내용" />
+    <div class="modal-row">
+      <input type="text" id="input-time" placeholder="시간 (예: 15:00)" style="flex:0 0 120px" />
+      <select id="input-category">
+        <option value="커뮤니케이션">커뮤니케이션</option>
+        <option value="비즈니스">비즈니스</option>
+        <option value="미팅">미팅</option>
+        <option value="콘텐츠">콘텐츠</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <select id="input-priority" style="margin-bottom:14px">
+      <option value="urgent">긴급</option>
+      <option value="normal" selected>보통</option>
+      <option value="low">낮음</option>
+    </select>
+    <button class="btn-add" onclick="addItem()">추가</button>
+  </div>
+</div>
+
+<script>
+const GIST_ID = '1529a93e379ac55d1eb823b392f28189';
+const GIST_FILE = 'glamdog-todo.json';
+const TOKEN_KEY = 'gd-gh-token';
+const TODAY = new Date().toISOString().slice(0,10);
+
+const SEED = [
+  { id: 's1', text: '김유연 답장', category: '커뮤니케이션', priority: 'urgent', time: '', done: false, date: TODAY },
+  { id: 's2', text: '권일환 대표 카톡', category: '커뮤니케이션', priority: 'urgent', time: '', done: false, date: TODAY },
+  { id: 's3', text: '가격전략정책 고도화', category: '비즈니스', priority: 'normal', time: '', done: false, date: TODAY },
+  { id: 's4', text: '여기어때 프로모션 확인', category: '비즈니스', priority: 'normal', time: '', done: false, date: TODAY },
+  { id: 's5', text: '블루타이거 미팅', category: '미팅', priority: 'urgent', time: '15:00', done: false, date: TODAY },
+  { id: 's6', text: '4/15 릴스 3개 제작', category: '콘텐츠', priority: 'normal', time: '', done: false, date: TODAY },
+  { id: 's7', text: '4/16 인스타 대행 미리작업', category: '콘텐츠', priority: 'low', time: '', done: false, date: TODAY },
+];
+
+let DB = { items: [] };
+let syncTimeout = null;
+
+// Date display
+const d = new Date();
+const days = ['일','월','화','수','목','금','토'];
+document.getElementById('date-display').textContent = `${d.getMonth()+1}/${d.getDate()} (${days[d.getDay()]})`;
+
+function getToken() { return localStorage.getItem(TOKEN_KEY); }
+function saveToken() {
+  const t = document.getElementById('token-input').value.trim();
+  if (!t.startsWith('ghp_')) { alert('올바른 토큰 형식이 아니에요 (ghp_로 시작해야 해요)'); return; }
+  localStorage.setItem(TOKEN_KEY, t);
+  document.getElementById('setup-screen').style.display = 'none';
+  init();
+}
+
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  label.textContent = msg;
+}
+
+async function loadFromGist() {
+  setSyncStatus('syncing', '불러오는 중...');
+  try {
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      headers: { Authorization: `token ${getToken()}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    const content = data.files[GIST_FILE]?.content;
+    if (content) {
+      const parsed = JSON.parse(content);
+      // If gist is empty, seed with today's items
+      if (!parsed.items || parsed.items.length === 0) {
+        DB = { items: SEED };
+        await saveToGist();
+      } else {
+        DB = parsed;
+      }
+    }
+    setSyncStatus('ok', '동기화 완료');
+    render();
+  } catch(e) {
+    setSyncStatus('error', '동기화 실패 — 토큰 확인 필요');
+    // Fallback to localStorage
+    const local = localStorage.getItem('gd-local');
+    if (local) DB = JSON.parse(local);
+    else DB = { items: SEED };
+    render();
+  }
+}
+
+async function saveToGist() {
+  setSyncStatus('syncing', '저장 중...');
+  localStorage.setItem('gd-local', JSON.stringify(DB));
+  try {
+    await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `token ${getToken()}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ files: { [GIST_FILE]: { content: JSON.stringify(DB, null, 2) } } })
+    });
+    setSyncStatus('ok', '저장 완료');
+  } catch(e) {
+    setSyncStatus('error', '저장 실패 (로컬에만 저장됨)');
+  }
+}
+
+function debounceSave() {
+  clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(saveToGist, 800);
+}
+
+function init() {
+  if (!getToken()) {
+    document.getElementById('setup-screen').style.display = 'flex';
+    return;
+  }
+  loadFromGist();
+}
+
+function getTodayItems() { return DB.items.filter(i => i.date === TODAY); }
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['todo','schedule','stats'][i] === tab);
+  });
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('pane-'+tab).classList.add('active');
+  render();
+}
+
+function render() { renderTodo(); renderSchedule(); renderStats(); updateProgress(); }
+
+function renderTodo() {
+  const todayItems = getTodayItems();
+  const categories = [...new Set(todayItems.map(i => i.category))];
+  const list = document.getElementById('todo-list');
+  if (todayItems.length === 0) {
+    list.innerHTML = `<div class="empty">오늘 할 일이 없습니다<br><span style="font-size:12px;margin-top:6px;display:block">+ 버튼으로 추가해보세요</span></div>`;
+    return;
+  }
+  let html = '';
+  categories.forEach(cat => {
+    const items = todayItems.filter(i => i.category === cat);
+    html += `<div class="section"><div class="section-label">${cat}</div>`;
+    items.forEach(item => {
+      const timeBadge = item.time ? `<span class="badge badge-time">${item.time}</span>` : '';
+      const urgentBadge = item.priority === 'urgent' && !item.time ? `<span class="badge badge-urgent">긴급</span>` : '';
+      html += `
+        <div class="todo-item ${item.done?'done':''}" onclick="toggleItem('${item.id}')">
+          <div class="check-ring ${item.done?'checked':''}">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+              <polyline points="1,5 4.5,8.5 11,1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="todo-body"><div class="todo-text">${item.text}</div></div>
+          ${timeBadge}${urgentBadge}
+          <button class="del-btn" onclick="deleteItem(event,'${item.id}')">×</button>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  list.innerHTML = html;
+}
+
+function renderSchedule() {
+  const timed = getTodayItems().filter(i => i.time).sort((a,b) => a.time.localeCompare(b.time));
+  const list = document.getElementById('schedule-list');
+  if (timed.length === 0) {
+    list.innerHTML = `<div class="empty">시간이 지정된 일정이 없습니다<br><span style="font-size:12px;margin-top:6px;display:block">할 일 추가 시 시간을 입력하면 여기 표시됩니다</span></div>`;
+    return;
+  }
+  let html = '<div class="section"><div class="section-label">오늘 시간별 일정</div>';
+  timed.forEach(item => {
+    html += `<div class="schedule-item">
+      <div class="sch-time">${item.time}</div>
+      <div class="sch-text ${item.done?'sch-done':''}">${item.text}</div>
+    </div>`;
+  });
+  list.innerHTML = html + '</div>';
+}
+
+function renderStats() {
+  const today = getTodayItems();
+  const done = today.filter(i => i.done);
+  document.getElementById('st-total').textContent = today.length;
+  document.getElementById('st-done').textContent = done.length;
+  document.getElementById('st-left').textContent = today.length - done.length;
+  const doneList = document.getElementById('done-list');
+  doneList.innerHTML = done.length === 0
+    ? `<div class="empty" style="padding:20px 0">아직 완료된 항목이 없습니다</div>`
+    : done.map(item => `
+        <div class="todo-item done">
+          <div class="check-ring checked">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+              <polyline points="1,5 4.5,8.5 11,1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="todo-body"><div class="todo-text">${item.text}</div></div>
+        </div>`).join('');
+}
+
+function updateProgress() {
+  const today = getTodayItems();
+  const pct = today.length ? Math.round(today.filter(i=>i.done).length / today.length * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = pct + '%';
+}
+
+function toggleItem(id) {
+  const item = DB.items.find(i => i.id === id);
+  if (item) { item.done = !item.done; render(); debounceSave(); }
+}
+
+function deleteItem(e, id) {
+  e.stopPropagation();
+  DB.items = DB.items.filter(i => i.id !== id);
+  render(); debounceSave();
+}
+
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('input-text').focus(), 300);
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('input-text').value = '';
+  document.getElementById('input-time').value = '';
+}
+
+function addItem() {
+  const text = document.getElementById('input-text').value.trim();
+  if (!text) return;
+  DB.items.push({
+    id: 'i' + Date.now(),
+    text,
+    category: document.getElementById('input-category').value,
+    priority: document.getElementById('input-priority').value,
+    time: document.getElementById('input-time').value.trim(),
+    done: false,
+    date: TODAY,
+  });
+  closeModal(); render(); debounceSave();
+}
+
+document.getElementById('input-text').addEventListener('keydown', e => { if (e.key === 'Enter') addItem(); });
+
+init();
+</script>
+</body>
+</html>
