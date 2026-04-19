@@ -6,6 +6,7 @@
 <title>Peter's Daily Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --gd:#1B5E20;--gm:#388E3C;--gl:#81C784;--gp:#E8F5E9;
@@ -103,12 +104,27 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .mbtn:active{opacity:.85}
 
 /* SETUP */
-.setup{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
-.setup-card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:26px 22px;width:100%;max-width:400px}
+.setup{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.setup-card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:26px 22px;width:100%;max-width:420px}
 .setup-card h2{font-size:17px;font-weight:700;margin-bottom:7px}
 .setup-card p{font-size:13px;color:var(--ink2);margin-bottom:18px;line-height:1.6}
 .setup-card input{width:100%;border:1px solid var(--bd);border-radius:9px;padding:11px 13px;font-size:13px;font-family:var(--mono);background:var(--bg);color:var(--ink);margin-bottom:11px;outline:none}
 .setup-card input:focus{border-color:var(--gm)}
+.setup-divider{border:none;border-top:1px solid var(--bd);margin:20px 0}
+.setup-section-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.setup-section-desc{font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.5}
+.gsign-btn{width:100%;padding:11px;border:1px solid var(--bd);border-radius:9px;font-size:13px;font-family:var(--sans);background:#fff;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:11px}
+.gsign-btn:hover{border-color:var(--gm)}
+.gsign-btn svg{flex-shrink:0}
+.gsign-connected{font-family:var(--mono);font-size:11px;color:var(--gm);margin-bottom:8px}
+.cat-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cat-chip{display:flex;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--bd);border-radius:20px;padding:4px 10px;font-size:12px}
+.cat-chip .cat-del{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:14px;padding:0 0 0 2px;line-height:1}
+.cat-chip .cat-del:hover{color:var(--red)}
+.cat-add-row{display:flex;gap:6px}
+.cat-add-row input{flex:1;border:1px solid var(--bd);border-radius:8px;padding:8px 11px;font-size:13px;font-family:var(--sans);background:var(--bg);color:var(--ink);outline:none}
+.cat-add-row input:focus{border-color:var(--gm)}
+.cat-add-btn{padding:8px 14px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer}
 
 /* STATS */
 .sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:18px}
@@ -166,6 +182,32 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .memo-item-date{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-bottom:6px}
 .memo-item-content{font-size:13px;color:var(--ink2);line-height:1.6;white-space:pre-wrap}
 
+/* HISTORY TAB */
+.hist-date-hd{font-size:13px;font-weight:700;color:var(--gd);margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between}
+.hist-date-badge{font-family:var(--mono);font-size:10px;background:var(--gp);color:var(--gd);padding:2px 8px;border-radius:10px}
+.hist-item{background:#fff;border:1px solid var(--bd);border-radius:9px;padding:10px 13px;margin-bottom:5px;display:flex;align-items:center;gap:10px}
+.hist-check{width:16px;height:16px;border-radius:50%;background:var(--gm);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.hist-check svg{display:block}
+.hist-body{flex:1;min-width:0}
+.hist-txt{font-size:13px;color:var(--ink);text-decoration:line-through;opacity:.7}
+.hist-sub{font-size:10px;color:var(--ink3);margin-top:2px;font-family:var(--mono)}
+.hist-cat{font-size:10px;padding:1px 7px;border-radius:10px;background:var(--bg2);color:var(--ink2)}
+.hist-filter-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.hist-filter-row::-webkit-scrollbar{display:none}
+.hf-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--bd);background:#fff;font-size:12px;color:var(--ink2);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.hf-btn.active{background:var(--gd);color:#fff;border-color:var(--gd)}
+.hist-export-row{display:flex;gap:8px;margin-bottom:16px}
+.export-btn{flex:1;padding:9px;border:1px solid var(--bd);border-radius:9px;font-size:12px;font-weight:700;font-family:var(--sans);cursor:pointer;background:#fff;color:var(--ink2)}
+.export-btn:hover{border-color:var(--gm);color:var(--gd)}
+.export-btn.gs{border-color:#0F9D58;color:#0F9D58;background:#F0FBF4}
+
+/* CATEGORY STATS */
+.cat-stat-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cat-stat-label{font-size:12px;color:var(--ink2);min-width:80px}
+.cat-stat-bar{flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.cat-stat-fill{height:100%;background:var(--gm);border-radius:3px;transition:width .4s}
+.cat-stat-num{font-family:var(--mono);font-size:11px;color:var(--ink3);min-width:28px;text-align:right}
+
 .empty{text-align:center;padding:30px 20px;color:var(--ink3);font-size:13px}
 </style>
 </head>
@@ -173,10 +215,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 
 <div class="setup" id="setup">
   <div class="setup-card">
-    <h2>🔐 GitHub 토큰 설정</h2>
-    <p>모든 기기에서 동기화하려면 GitHub Personal Access Token이 필요해요. 토큰은 이 기기에만 저장됩니다.</p>
+    <h2>Peter's Daily Board</h2>
+    <p>GitHub Gist로 모든 기기에서 동기화됩니다. Personal Access Token이 필요해요.</p>
     <input type="password" id="tok-in" placeholder="ghp_xxxxxxxxxxxx" />
     <button class="mbtn" onclick="saveToken()">저장하고 시작하기</button>
+
+    <hr class="setup-divider">
+    <div class="setup-section-title">Google Sheets 연동 (선택)</div>
+    <div class="setup-section-desc">Google 계정으로 로그인하면 완료된 항목을 Sheets에 자동 기록할 수 있어요. Client ID는 Google Cloud Console에서 발급받으세요.</div>
+    <input type="text" id="gc-client-id" placeholder="Google OAuth Client ID" />
+    <input type="text" id="gc-sheet-id" placeholder="Google Sheets ID (URL에서 /d/.../ 부분)" />
+    <button class="mbtn" style="background:var(--bg2);color:var(--ink2);border:1px solid var(--bd);margin-top:0" onclick="saveGoogleSettings()">Google 설정 저장</button>
+
+    <hr class="setup-divider">
+    <div class="setup-section-title">카테고리 관리</div>
+    <div class="cat-list" id="setup-cat-list"></div>
+    <div class="cat-add-row">
+      <input type="text" id="new-cat-in" placeholder="새 카테고리 이름" />
+      <button class="cat-add-btn" onclick="addCategory()">추가</button>
+    </div>
   </div>
 </div>
 
@@ -199,6 +256,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
   <button class="tab" onclick="go('week')">주간</button>
   <button class="tab" onclick="go('month')">월간</button>
   <button class="tab" onclick="go('memo')">메모</button>
+  <button class="tab" onclick="go('hist')">기록</button>
   <button class="tab" onclick="go('stats')">현황</button>
 </div>
 
@@ -264,12 +322,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     <div id="memo-list"></div>
   </div>
 
+  <!-- HISTORY -->
+  <div class="pane" id="pane-hist">
+    <div class="hist-filter-row" id="hist-filters"></div>
+    <div class="hist-export-row">
+      <button class="export-btn" onclick="exportCSV()">CSV 다운로드</button>
+      <button class="export-btn gs" onclick="exportToSheets()">Sheets에 기록</button>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+
   <!-- STATS -->
   <div class="pane" id="pane-stats">
     <div class="sgrid">
       <div class="scard"><div class="snum" id="st-tot">0</div><div class="slbl">전체</div></div>
       <div class="scard"><div class="snum g" id="st-done">0</div><div class="slbl">완료</div></div>
       <div class="scard"><div class="snum r" id="st-left">0</div><div class="slbl">남은 일</div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-lbl" style="margin-bottom:10px">카테고리별 완료율</div>
+      <div id="cat-stats"></div>
     </div>
     <div class="sec"><div class="sec-lbl">오늘 완료</div><div id="done-list"></div></div>
     <div class="sec"><div class="sec-lbl">미완료</div><div id="left-list"></div></div>
@@ -288,10 +360,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     <input type="date" id="in-date" />
     <div class="mrow">
       <input type="text" id="in-time" placeholder="시간 (예: 15:00)" style="flex:0 0 115px" />
-      <select id="in-cat">
-        <option>커뮤니케이션</option><option>비즈니스</option>
-        <option>미팅</option><option>콘텐츠</option><option>기타</option>
-      </select>
+      <select id="in-cat"></select>
     </div>
     <select id="in-pri" style="margin-bottom:12px">
       <option value="urgent">긴급</option>
@@ -302,12 +371,34 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="overlay" id="settings-modal" onclick="closeSettingsOut(event)">
+  <div class="modal" style="max-height:80vh;overflow-y:auto">
+    <div class="mhandle"></div>
+    <h2>설정</h2>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">GitHub 토큰</div>
+    <input type="password" id="settings-tok" placeholder="ghp_xxxxxxxxxxxx" style="margin-bottom:8px" />
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px;margin-top:4px">Google OAuth Client ID</div>
+    <input type="text" id="settings-client-id" placeholder="Google Client ID" style="margin-bottom:8px" />
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">Google Sheets ID</div>
+    <input type="text" id="settings-sheet-id" placeholder="Sheets ID" style="margin-bottom:14px" />
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">카테고리</div>
+    <div class="cat-list" id="modal-cat-list"></div>
+    <div class="cat-add-row" style="margin-bottom:12px">
+      <input type="text" id="modal-new-cat" placeholder="새 카테고리" style="margin-bottom:0" />
+      <button class="cat-add-btn" onclick="addCategoryModal()">추가</button>
+    </div>
+    <button class="mbtn" onclick="saveSettings()">저장</button>
+  </div>
+</div>
+
 <script>
 const GIST_ID='1529a93e379ac55d1eb823b392f28189';
 const GIST_FILE='glamdog-todo.json';
 const TOKEN_KEY='gd-gh-token';
 const TODAY=new Date().toISOString().slice(0,10);
 const DAYS=['일','월','화','수','목','금','토'];
+const DEFAULT_CATS=['커뮤니케이션','비즈니스','미팅','콘텐츠','기타'];
 
 function tomorrow(){const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().slice(0,10);}
 
@@ -326,8 +417,11 @@ let syncT=null;
 let calYear,calMonth,selCalDate=TODAY;
 let weekOffset=0,selWeekDay=TODAY;
 let monthYear,monthMonth;
-let expandedId=null; // which item is expanded
-let moveItemId=null; // item being moved via calendar
+let expandedId=null;
+let moveItemId=null;
+let histFilter='전체';
+let googleAccessToken=null;
+let idb=null;
 
 const nd=new Date();
 calYear=nd.getFullYear();calMonth=nd.getMonth();
@@ -335,14 +429,189 @@ monthYear=nd.getFullYear();monthMonth=nd.getMonth();
 
 document.getElementById('date-disp').textContent=`${nd.getMonth()+1}/${nd.getDate()}(${DAYS[nd.getDay()]})`;
 
+// ── CATEGORIES ──
+function getCats(){
+  const s=localStorage.getItem('gd-cats');
+  return s?JSON.parse(s):[...DEFAULT_CATS];
+}
+function saveCats(cats){
+  localStorage.setItem('gd-cats',JSON.stringify(cats));
+  updateCatSelects();
+  renderSetupCats();
+  renderModalCats();
+}
+function updateCatSelects(){
+  const cats=getCats();
+  ['in-cat'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const prev=el.value;
+    el.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+    if(cats.includes(prev))el.value=prev;
+  });
+}
+function renderSetupCats(){
+  const cats=getCats();
+  const el=document.getElementById('setup-cat-list');
+  if(!el)return;
+  el.innerHTML=cats.map(c=>`<div class="cat-chip">${c}<button class="cat-del" onclick="delCat('${c}')">×</button></div>`).join('');
+}
+function renderModalCats(){
+  const cats=getCats();
+  const el=document.getElementById('modal-cat-list');
+  if(!el)return;
+  el.innerHTML=cats.map(c=>`<div class="cat-chip">${c}<button class="cat-del" onclick="delCat('${c}')">×</button></div>`).join('');
+}
+function addCategory(){
+  const inp=document.getElementById('new-cat-in');
+  const v=inp.value.trim();
+  if(!v)return;
+  const cats=getCats();
+  if(!cats.includes(v)){cats.push(v);saveCats(cats);}
+  inp.value='';
+}
+function addCategoryModal(){
+  const inp=document.getElementById('modal-new-cat');
+  const v=inp.value.trim();
+  if(!v)return;
+  const cats=getCats();
+  if(!cats.includes(v)){cats.push(v);saveCats(cats);}
+  inp.value='';
+}
+function delCat(name){
+  const cats=getCats().filter(c=>c!==name);
+  saveCats(cats);
+}
+
+// ── IndexedDB ──
+function openIDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open('gd-board',2);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('data'))db.createObjectStore('data',{keyPath:'key'});
+    };
+    req.onsuccess=e=>{idb=e.target.result;resolve(idb);};
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function saveIDB(){
+  if(!idb)return;
+  try{
+    const tx=idb.transaction('data','readwrite');
+    tx.objectStore('data').put({key:'db',value:JSON.stringify(DB)});
+  }catch(e){}
+}
+async function loadIDB(){
+  if(!idb)return null;
+  return new Promise(resolve=>{
+    const tx=idb.transaction('data','readonly');
+    const req=tx.objectStore('data').get('db');
+    req.onsuccess=()=>{
+      if(req.result)try{resolve(JSON.parse(req.result.value));}catch{resolve(null);}
+      else resolve(null);
+    };
+    req.onerror=()=>resolve(null);
+  });
+}
+
 // ── TOKEN ──
 function getToken(){return localStorage.getItem(TOKEN_KEY);}
 function saveToken(){
   const t=document.getElementById('tok-in').value.trim();
   if(!t.startsWith('ghp_')){alert('올바른 토큰 형식이 아니에요 (ghp_로 시작)');return;}
   localStorage.setItem(TOKEN_KEY,t);
+  saveGoogleSettings();
   document.getElementById('setup').style.display='none';
   init();
+}
+
+// ── GOOGLE SETTINGS ──
+function saveGoogleSettings(){
+  const cid=document.getElementById('gc-client-id')?.value.trim();
+  const sid=document.getElementById('gc-sheet-id')?.value.trim();
+  if(cid)localStorage.setItem('gd-google-client-id',cid);
+  if(sid)localStorage.setItem('gd-google-sheet-id',sid);
+}
+
+// ── GOOGLE OAUTH2 ──
+function initGoogleAuth(){
+  const clientId=localStorage.getItem('gd-google-client-id');
+  if(!clientId||!window.google?.accounts)return;
+  try{
+    google.accounts.oauth2.initTokenClient({
+      client_id:clientId,
+      scope:'https://www.googleapis.com/auth/spreadsheets',
+      callback:(resp)=>{
+        if(resp.access_token){
+          googleAccessToken=resp.access_token;
+          setSS('ok','Google 연동 완료');
+        }
+      }
+    }).requestAccessToken({prompt:''});
+  }catch(e){}
+}
+
+function requestGoogleAuth(){
+  const clientId=localStorage.getItem('gd-google-client-id');
+  if(!clientId){alert('Google Client ID를 설정에서 먼저 입력해주세요.');openSettings();return;}
+  if(!window.google?.accounts){alert('Google API가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');return;}
+  google.accounts.oauth2.initTokenClient({
+    client_id:clientId,
+    scope:'https://www.googleapis.com/auth/spreadsheets',
+    callback:(resp)=>{
+      if(resp.access_token){
+        googleAccessToken=resp.access_token;
+        setSS('ok','Google 연동 완료');
+      }
+    }
+  }).requestAccessToken();
+}
+
+// ── GOOGLE SHEETS EXPORT ──
+async function exportToSheets(){
+  const sheetId=localStorage.getItem('gd-google-sheet-id');
+  if(!sheetId){alert('Google Sheets ID를 설정에서 먼저 입력해주세요.');return;}
+  if(!googleAccessToken){
+    requestGoogleAuth();
+    setTimeout(()=>exportToSheets(),2000);
+    return;
+  }
+  const doneItems=DB.items.filter(i=>i.done);
+  if(!doneItems.length){alert('완료된 항목이 없습니다.');return;}
+  setSS('syncing','Sheets에 기록 중...');
+  const values=[
+    ['날짜','내용','카테고리','우선순위','시간','메모','기록시각'],
+    ...doneItems.map(i=>[i.date,i.text,i.category,i.priority||'normal',i.time||'',i.memo||'',new Date().toLocaleString('ko-KR')])
+  ];
+  try{
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/완료기록!A1:G${values.length}?valueInputOption=USER_ENTERED`,{
+      method:'PUT',
+      headers:{Authorization:`Bearer ${googleAccessToken}`,'Content-Type':'application/json'},
+      body:JSON.stringify({values})
+    });
+    if(r.ok){setSS('ok','Sheets 기록 완료');}
+    else{
+      const err=await r.json();
+      if(err.error?.code===401){googleAccessToken=null;requestGoogleAuth();}
+      else setSS('error','Sheets 기록 실패');
+    }
+  }catch{setSS('error','Sheets 기록 실패');}
+}
+
+// ── CSV EXPORT ──
+function exportCSV(){
+  const rows=[['날짜','내용','카테고리','우선순위','시간','완료','메모']];
+  const sorted=[...DB.items].sort((a,b)=>b.date.localeCompare(a.date));
+  sorted.forEach(i=>{
+    rows.push([i.date,`"${i.text}"`,i.category,i.priority||'normal',i.time||'',i.done?'완료':'미완료',`"${(i.memo||'').replace(/"/g,'""')}"`]);
+  });
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`daily-board-${TODAY}.csv`;
+  a.click();
 }
 
 // ── SYNC ──
@@ -366,15 +635,19 @@ async function loadGist(){
       else{
         DB=p;
         if(!DB.goals)DB.goals={};
-        // ensure memo field exists
         DB.items.forEach(i=>{if(i.memo===undefined)i.memo='';});
       }
     }
+    await saveIDB();
     setSS('ok','동기화 완료');renderAll();
   }catch{
-    setSS('error','동기화 실패');
-    const local=localStorage.getItem('gd-local');
-    DB=local?JSON.parse(local):{items:SEED,goals:{}};
+    setSS('error','오프라인 — 로컬 데이터 사용 중');
+    const idbData=await loadIDB();
+    if(idbData){DB=idbData;}
+    else{
+      const local=localStorage.getItem('gd-local');
+      DB=local?JSON.parse(local):{items:SEED,goals:{}};
+    }
     if(!DB.goals)DB.goals={};
     DB.items.forEach(i=>{if(i.memo===undefined)i.memo='';});
     renderAll();
@@ -384,6 +657,7 @@ async function loadGist(){
 async function saveGist(){
   setSS('syncing','저장 중...');
   localStorage.setItem('gd-local',JSON.stringify(DB));
+  saveIDB();
   try{
     await fetch(`https://api.github.com/gists/${GIST_ID}`,{
       method:'PATCH',
@@ -396,15 +670,23 @@ async function saveGist(){
 
 function debSave(){clearTimeout(syncT);syncT=setTimeout(saveGist,800);}
 
-function init(){
-  if(!getToken()){document.getElementById('setup').style.display='flex';return;}
+async function init(){
+  await openIDB();
+  updateCatSelects();
+  if(!getToken()){
+    renderSetupCats();
+    document.getElementById('setup').style.display='flex';
+    return;
+  }
   document.getElementById('in-date').value=TODAY;
   loadGist();
+  setTimeout(initGoogleAuth,2000);
 }
 
 // ── TABS ──
 function go(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['today','cal','week','month','memo','stats'][i]===tab));
+  const tabNames=['today','cal','week','month','memo','hist','stats'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabNames[i]===tab));
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('pane-'+tab).classList.add('active');
   expandedId=null;
@@ -413,13 +695,14 @@ function go(tab){
   else if(tab==='week')renderWeek();
   else if(tab==='month')renderMonth();
   else if(tab==='memo')renderMemoTab();
+  else if(tab==='hist')renderHistory();
   else if(tab==='stats')renderStats();
 }
 
 function renderAll(){renderToday();renderProgress();}
 
 // ── ITEM HTML ──
-function itemHTML(item, showDate=false){
+function itemHTML(item,showDate=false){
   const isExp=expandedId===item.id;
   const timeBadge=item.time?`<span class="badge bt">${item.time}</span>`:'';
   const urgBadge=item.priority==='urgent'&&!item.time?`<span class="badge bu">긴급</span>`:'';
@@ -439,13 +722,10 @@ function itemHTML(item, showDate=false){
     </div>`;
 
   if(isExp){
-    // memo panel
     html+=`<div class="memo-panel">
       <textarea class="memo-ta" id="memo-${item.id}" placeholder="메모를 입력하세요...">${item.memo||''}</textarea>
       <button class="memo-save" onclick="saveMemo('${item.id}')">메모 저장</button>
     </div>`;
-    // actions
-    const tmr=tomorrow();
     html+=`<div class="item-actions">
       <button class="act-btn postpone" onclick="postpone('${item.id}')">→ 내일로 미루기</button>
       <button class="act-btn" onclick="startMove('${item.id}')">📅 날짜 이동</button>
@@ -492,7 +772,6 @@ function saveMemo(id){
   item.memo=document.getElementById('memo-'+id).value;
   debSave();
   setSS('ok','메모 저장됨');
-  // re-render to show dot
   refreshCurrent();
 }
 
@@ -568,14 +847,8 @@ function renderCal(){
 
 function calDayClick(date){
   if(moveItemId){
-    // move item to this date
     const item=DB.items.find(x=>x.id===moveItemId);
-    if(item){
-      item.date=date;
-      item.done=false;
-      setSS('ok',`${date}로 이동했습니다`);
-      debSave();
-    }
+    if(item){item.date=date;item.done=false;setSS('ok',`${date}로 이동했습니다`);debSave();}
     moveItemId=null;
     document.getElementById('move-mode-bar').classList.remove('active');
     selCalDate=date;
@@ -677,7 +950,6 @@ function renderMemoTab(){
   const items=DB.items.filter(i=>i.memo&&i.memo.trim());
   const el=document.getElementById('memo-list');
   if(!items.length){el.innerHTML=`<div class="empty">메모가 있는 항목이 없습니다<br><span style="font-size:11px;margin-top:5px;display:block">항목을 클릭하면 메모를 남길 수 있어요</span></div>`;return;}
-  // sort by date desc
   const sorted=[...items].sort((a,b)=>b.date.localeCompare(a.date));
   el.innerHTML=sorted.map(i=>`
     <div class="memo-item">
@@ -687,6 +959,45 @@ function renderMemoTab(){
     </div>`).join('');
 }
 
+// ── HISTORY ──
+function renderHistory(){
+  const cats=getCats();
+  const filters=['전체',...cats];
+  const el=document.getElementById('hist-filters');
+  el.innerHTML=filters.map(f=>`<button class="hf-btn${histFilter===f?' active':''}" onclick="setHistFilter('${f}')">${f}</button>`).join('');
+
+  let items=DB.items.filter(i=>i.done);
+  if(histFilter!=='전체')items=items.filter(i=>i.category===histFilter);
+  items.sort((a,b)=>b.date.localeCompare(a.date));
+
+  const listEl=document.getElementById('hist-list');
+  if(!items.length){listEl.innerHTML=`<div class="empty">완료된 항목이 없습니다</div>`;return;}
+
+  const byDate={};
+  items.forEach(i=>{if(!byDate[i.date])byDate[i.date]=[];byDate[i.date].push(i);});
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+
+  let h='';
+  dates.forEach(date=>{
+    const d=new Date(date);
+    const dayItems=byDate[date];
+    h+=`<div class="hist-date-hd"><span>${d.getMonth()+1}월 ${d.getDate()}일 (${DAYS[d.getDay()]})</span><span class="hist-date-badge">${dayItems.length}개</span></div>`;
+    dayItems.forEach(i=>{
+      h+=`<div class="hist-item">
+        <div class="hist-check"><svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1,3.5 3.5,6 8,1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="hist-body">
+          <div class="hist-txt">${i.text}</div>
+          <div class="hist-sub">${i.time||''}</div>
+        </div>
+        <span class="hist-cat">${i.category}</span>
+      </div>`;
+    });
+  });
+  listEl.innerHTML=h;
+}
+
+function setHistFilter(f){histFilter=f;renderHistory();}
+
 // ── STATS ──
 function renderStats(){
   const items=DB.items.filter(i=>i.date===TODAY);
@@ -694,14 +1005,31 @@ function renderStats(){
   document.getElementById('st-tot').textContent=items.length;
   document.getElementById('st-done').textContent=done.length;
   document.getElementById('st-left').textContent=left.length;
+
+  const cats=getCats();
+  const allItems=DB.items;
+  let catH='';
+  cats.forEach(c=>{
+    const cItems=allItems.filter(i=>i.category===c);
+    if(!cItems.length)return;
+    const cDone=cItems.filter(i=>i.done).length;
+    const pct=Math.round(cDone/cItems.length*100);
+    catH+=`<div class="cat-stat-row">
+      <span class="cat-stat-label">${c}</span>
+      <div class="cat-stat-bar"><div class="cat-stat-fill" style="width:${pct}%"></div></div>
+      <span class="cat-stat-num">${cDone}/${cItems.length}</span>
+    </div>`;
+  });
+  document.getElementById('cat-stats').innerHTML=catH||`<div class="empty" style="padding:10px">데이터 없음</div>`;
+
   document.getElementById('done-list').innerHTML=done.length?done.map(i=>itemHTML(i)).join(''):`<div class="empty" style="padding:14px">아직 완료 없음</div>`;
   document.getElementById('left-list').innerHTML=left.length?left.map(i=>itemHTML(i)).join(''):`<div class="empty" style="padding:14px">모두 완료!</div>`;
 }
 
 // ── REFRESH CURRENT TAB ──
 function refreshCurrent(){
+  const tabs=['today','cal','week','month','memo','hist','stats'];
   const idx=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
-  const tabs=['today','cal','week','month','memo','stats'];
   const tab=tabs[idx];
   renderProgress();
   if(tab==='today')renderToday();
@@ -709,13 +1037,34 @@ function refreshCurrent(){
   else if(tab==='week')renderWeekDay();
   else if(tab==='month')renderMonth();
   else if(tab==='memo')renderMemoTab();
+  else if(tab==='hist')renderHistory();
   else if(tab==='stats')renderStats();
+}
+
+// ── SETTINGS ──
+function openSettings(){
+  document.getElementById('settings-tok').value=getToken()||'';
+  document.getElementById('settings-client-id').value=localStorage.getItem('gd-google-client-id')||'';
+  document.getElementById('settings-sheet-id').value=localStorage.getItem('gd-google-sheet-id')||'';
+  renderModalCats();
+  document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettingsOut(e){if(e.target===document.getElementById('settings-modal'))document.getElementById('settings-modal').classList.remove('open');}
+function saveSettings(){
+  const tok=document.getElementById('settings-tok').value.trim();
+  if(tok)localStorage.setItem(TOKEN_KEY,tok);
+  const cid=document.getElementById('settings-client-id').value.trim();
+  if(cid)localStorage.setItem('gd-google-client-id',cid);
+  const sid=document.getElementById('settings-sheet-id').value.trim();
+  if(sid)localStorage.setItem('gd-google-sheet-id',sid);
+  document.getElementById('settings-modal').classList.remove('open');
+  setSS('ok','설정 저장됨');
 }
 
 // ── MODAL ──
 function openModal(){
+  const tabs=['today','cal','week','month','memo','hist','stats'];
   const idx=[...document.querySelectorAll('.tab')].findIndex(t=>t.classList.contains('active'));
-  const tabs=['today','cal','week','month','memo','stats'];
   let prefill=TODAY;
   if(tabs[idx]==='cal')prefill=selCalDate;
   else if(tabs[idx]==='week')prefill=selWeekDay;
@@ -742,7 +1091,14 @@ function addItem(){
   });
   closeModal();refreshCurrent();debSave();
 }
-document.getElementById('in-text').addEventListener('keydown',e=>{if(e.key==='Enter')addItem();});
+document.addEventListener('DOMContentLoaded',()=>{
+  const textIn=document.getElementById('in-text');
+  if(textIn)textIn.addEventListener('keydown',e=>{if(e.key==='Enter')addItem();});
+});
+
+// 헤더 제목 클릭 시 설정 열기
+document.querySelector('.hd h1').style.cursor='pointer';
+document.querySelector('.hd h1').addEventListener('click',openSettings);
 
 init();
 </script>
