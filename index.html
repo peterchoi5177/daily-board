@@ -396,11 +396,21 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 const GIST_ID='1529a93e379ac55d1eb823b392f28189';
 const GIST_FILE='glamdog-todo.json';
 const TOKEN_KEY='gd-gh-token';
-const TODAY=new Date().toISOString().slice(0,10);
 const DAYS=['일','월','화','수','목','금','토'];
 const DEFAULT_CATS=['커뮤니케이션','비즈니스','미팅','콘텐츠','기타'];
 
-function tomorrow(){const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().slice(0,10);}
+// 로컬 시간 기준 날짜 헬퍼 (UTC 오류 방지)
+function localDate(d=new Date()){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function parseLocalDate(ds){
+  const [y,m,d]=ds.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+
+const TODAY=localDate();
+
+function tomorrow(){const d=new Date();d.setDate(d.getDate()+1);return localDate(d);}
 
 const SEED=[
   {id:'s1',text:'김유연 답장',category:'커뮤니케이션',priority:'urgent',time:'',done:false,date:TODAY,memo:''},
@@ -852,17 +862,17 @@ function calDayClick(date){
     moveItemId=null;
     document.getElementById('move-mode-bar').classList.remove('active');
     selCalDate=date;
-    const d=new Date(date);calYear=d.getFullYear();calMonth=d.getMonth();
+    const d=parseLocalDate(date);calYear=d.getFullYear();calMonth=d.getMonth();
     renderCal();
   } else {
     selCalDate=date;
-    const d=new Date(date);calYear=d.getFullYear();calMonth=d.getMonth();
+    const d=parseLocalDate(date);calYear=d.getFullYear();calMonth=d.getMonth();
     renderCal();
   }
 }
 
 function renderCalItems(){
-  const d=new Date(selCalDate);
+  const d=parseLocalDate(selCalDate);
   document.getElementById('cal-sel-lbl').textContent=`${d.getMonth()+1}월 ${d.getDate()}일 (${DAYS[d.getDay()]})${selCalDate===TODAY?' — 오늘':''}`;
   const items=DB.items.filter(i=>i.date===selCalDate);
   const el=document.getElementById('cal-items');
@@ -871,7 +881,7 @@ function renderCalItems(){
 }
 
 // ── WEEK ──
-function toDS(d){return d.toISOString().slice(0,10);}
+function toDS(d){return localDate(d);}
 function getWS(offset){const d=new Date();d.setDate(d.getDate()-d.getDay()+offset*7);d.setHours(0,0,0,0);return d;}
 function weekMove(d){weekOffset+=d;renderWeek();}
 
@@ -902,7 +912,7 @@ function renderWeek(){
 function selWeek(date){selWeekDay=date;renderWeek();}
 
 function renderWeekDay(){
-  const d=new Date(selWeekDay);
+  const d=parseLocalDate(selWeekDay);
   document.getElementById('week-day-lbl').textContent=`${d.getMonth()+1}월 ${d.getDate()}일 할 일`;
   const items=DB.items.filter(i=>i.date===selWeekDay);
   const el=document.getElementById('week-day-items');
@@ -979,7 +989,7 @@ function renderHistory(){
 
   let h='';
   dates.forEach(date=>{
-    const d=new Date(date);
+    const d=parseLocalDate(date);
     const dayItems=byDate[date];
     h+=`<div class="hist-date-hd"><span>${d.getMonth()+1}월 ${d.getDate()}일 (${DAYS[d.getDay()]})</span><span class="hist-date-badge">${dayItems.length}개</span></div>`;
     dayItems.forEach(i=>{
