@@ -256,6 +256,30 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
 .tt-month-date{font-size:11px;font-weight:500;margin-bottom:3px;color:var(--ink)}
 .tt-month-block{border-radius:3px;padding:1px 5px;font-size:9px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-bottom:2px}
 .tt-month-more{font-size:8px;color:var(--ink3)}
+
+/* ── 시간표 분할 레이아웃 ── */
+.tt-outer{display:flex;gap:12px;align-items:flex-start}
+.tt-sidebar{width:165px;flex-shrink:0}
+.tt-sidebar-hd{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+.tt-todo-item{background:#fff;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;margin-bottom:5px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.tt-todo-item:active{background:var(--bg2)}
+.tt-todo-item.done{opacity:.45}
+.tt-todo-item.done .tt-todo-text{text-decoration:line-through;color:var(--ink3)}
+.tt-todo-chk{display:flex;align-items:flex-start;gap:7px}
+.tt-todo-ring{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .2s}
+.tt-todo-ring.ck{background:var(--gm);border-color:var(--gm)}
+.tt-todo-ring.ck svg{display:block}
+.tt-todo-ring svg{display:none}
+.tt-todo-body{flex:1;min-width:0}
+.tt-todo-time{font-family:var(--mono);font-size:9px;color:var(--blue);margin-bottom:2px}
+.tt-todo-text{font-size:12px;color:var(--ink);line-height:1.3;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tt-todo-cat{font-size:9px;color:var(--ink3);margin-top:2px}
+#tt-area{flex:1;min-width:0}
+@media(max-width:540px){
+  .tt-outer{flex-direction:column}
+  .tt-sidebar{width:100%;order:2}
+  #tt-area{order:1;width:100%}
+}
 </style>
 </head>
 <body>
@@ -407,7 +431,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
         <button class="tt-view-btn" onclick="setTTView('month')">월</button>
       </div>
     </div>
-    <div id="tt-area"></div>
+    <div class="tt-outer">
+      <div class="tt-sidebar" id="tt-sidebar"></div>
+      <div id="tt-area"></div>
+    </div>
   </div>
 
 </div>
@@ -445,11 +472,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:10
     <input type="text" id="settings-client-id" placeholder="Google Client ID" style="margin-bottom:8px" />
     <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">Google Sheets ID</div>
     <input type="text" id="settings-sheet-id" placeholder="Sheets ID" style="margin-bottom:14px" />
-    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">카테고리</div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">할일 카테고리</div>
     <div class="cat-list" id="modal-cat-list"></div>
     <div class="cat-add-row" style="margin-bottom:12px">
       <input type="text" id="modal-new-cat" placeholder="새 카테고리" style="margin-bottom:0" />
       <button class="cat-add-btn" onclick="addCategoryModal()">추가</button>
+    </div>
+    <hr class="setup-divider" style="margin:14px 0">
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:8px">시간표 카테고리</div>
+    <div class="cat-list" id="modal-tt-cat-list"></div>
+    <div class="cat-add-row" style="margin-bottom:12px">
+      <input type="text" id="modal-new-tt-cat" placeholder="새 시간표 카테고리" style="margin-bottom:0" />
+      <button class="cat-add-btn" onclick="addTTCategoryModal()">추가</button>
     </div>
     <button class="mbtn" onclick="saveSettings()">저장</button>
   </div>
@@ -476,6 +510,7 @@ const GIST_FILE='glamdog-todo.json';
 const TOKEN_KEY='gd-gh-token';
 const DAYS=['일','월','화','수','목','금','토'];
 const DEFAULT_CATS=['커뮤니케이션','비즈니스','미팅','콘텐츠','기타'];
+const TT_DEFAULT_CATS=['일상','휴식','업무','개발','공부','통화','출장'];
 
 // 로컬 시간 기준 날짜 헬퍼 (UTC 오류 방지)
 function localDate(d=new Date()){
@@ -551,13 +586,8 @@ function saveCats(cats){
 }
 function updateCatSelects(){
   const cats=getCats();
-  ['in-cat','tt-in-cat'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    const prev=el.value;
-    el.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
-    if(cats.includes(prev))el.value=prev;
-  });
+  const el=document.getElementById('in-cat');
+  if(el){const prev=el.value;el.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');if(cats.includes(prev))el.value=prev;}
 }
 function renderSetupCats(){
   const el=document.getElementById('setup-cat-list');
@@ -578,6 +608,28 @@ function addCategoryModal(){
   const cats=getCats();if(!cats.includes(v)){cats.push(v);saveCats(cats);}inp.value='';
 }
 function delCat(name){saveCats(getCats().filter(c=>c!==name));}
+
+// ── TIMETABLE CATEGORIES (별도 관리) ──
+function getTTCats(){const s=localStorage.getItem('gd-tt-cats');return s?JSON.parse(s):[...TT_DEFAULT_CATS];}
+function saveTTCats(cats){localStorage.setItem('gd-tt-cats',JSON.stringify(cats));updateTTCatSelect();renderModalTTCats();}
+function updateTTCatSelect(){
+  const cats=getTTCats();const el=document.getElementById('tt-in-cat');if(!el)return;
+  const prev=el.value;el.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+  if(cats.includes(prev))el.value=prev;
+}
+function getTTCatColor(cat){
+  const idx=getTTCats().indexOf(cat);
+  return CAT_PALETTE[idx<0?0:idx%CAT_PALETTE.length];
+}
+function renderModalTTCats(){
+  const el=document.getElementById('modal-tt-cat-list');if(!el)return;
+  el.innerHTML=getTTCats().map(c=>`<div class="cat-chip">${c}<button class="cat-del" onclick="delTTCat('${c}')">×</button></div>`).join('');
+}
+function addTTCategoryModal(){
+  const inp=document.getElementById('modal-new-tt-cat');const v=inp.value.trim();if(!v)return;
+  const cats=getTTCats();if(!cats.includes(v)){cats.push(v);saveTTCats(cats);}inp.value='';
+}
+function delTTCat(name){saveTTCats(getTTCats().filter(c=>c!==name));}
 
 // ── IndexedDB ──
 function openIDB(){
@@ -695,7 +747,7 @@ async function saveGist(){
 function debSave(){clearTimeout(syncT);syncT=setTimeout(saveGist,800);}
 
 async function init(){
-  await openIDB();updateCatSelects();
+  await openIDB();updateCatSelects();updateTTCatSelect();
   if(!getToken()){renderSetupCats();document.getElementById('setup').style.display='flex';return;}
   document.getElementById('in-date').value=TODAY;
   loadGist();setTimeout(initGoogleAuth,2000);
@@ -930,7 +982,7 @@ function openSettings(){
   document.getElementById('settings-tok').value=getToken()||'';
   document.getElementById('settings-client-id').value=localStorage.getItem('gd-google-client-id')||'';
   document.getElementById('settings-sheet-id').value=localStorage.getItem('gd-google-sheet-id')||'';
-  renderModalCats();document.getElementById('settings-modal').classList.add('open');
+  renderModalCats();renderModalTTCats();document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettingsOut(e){if(e.target===document.getElementById('settings-modal'))document.getElementById('settings-modal').classList.remove('open');}
 function saveSettings(){
@@ -1001,7 +1053,7 @@ function addNowLine(colEl){
 
 // 블록 HTML
 function ttBlockHTML(b){
-  const col=getCatColor(b.category);
+  const col=getTTCatColor(b.category);
   const top=b.startSlot*TT_SH;
   const h=Math.max((b.endSlot-b.startSlot)*TT_SH,26);
   return `<div class="tt-block" id="ttb-${b.id}"
@@ -1046,10 +1098,48 @@ function ttMove(dir){
 function renderTT(){
   updateTTNav();
   const area=document.getElementById('tt-area');
+  const sidebar=document.getElementById('tt-sidebar');
   if(!DB.timeBlocks)DB.timeBlocks=[];
-  if(ttView==='day')renderTTDay(area);
+  const isDay=ttView==='day';
+  if(sidebar)sidebar.style.display=isDay?'block':'none';
+  if(ttView==='day'){renderTTDay(area);renderTTSidebar();}
   else if(ttView==='week')renderTTWeek(area);
   else renderTTMonth(area);
+}
+
+// ── 사이드바: 오늘/선택일 일정 ──
+function renderTTSidebar(){
+  const sidebar=document.getElementById('tt-sidebar');if(!sidebar)return;
+  const ds=(ttView==='day')?ttDate:TODAY;
+  const d=parseLocalDate(ds);
+  const items=DB.items.filter(i=>i.date===ds);
+  const lbl=ds===TODAY?'오늘 일정':`${d.getMonth()+1}/${d.getDate()} 일정`;
+  let h=`<div class="tt-sidebar-hd">${lbl}</div>`;
+  if(!items.length){
+    h+=`<div style="font-size:12px;color:var(--ink3);padding:6px 2px">일정 없음</div>`;
+  } else {
+    const wt=items.filter(i=>i.time).sort((a,b)=>a.time.localeCompare(b.time));
+    const nt=items.filter(i=>!i.time);
+    [...wt,...nt].forEach(item=>{
+      h+=`<div class="tt-todo-item${item.done?' done':''}" onclick="ttTodoToggle('${item.id}')">
+        <div class="tt-todo-chk">
+          <div class="tt-todo-ring${item.done?' ck':''}">
+            <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="1,3 3,5 7,1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="tt-todo-body">
+            ${item.time?`<div class="tt-todo-time">${item.time}</div>`:''}
+            <div class="tt-todo-text">${item.text}</div>
+            <div class="tt-todo-cat">${item.category}</div>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  sidebar.innerHTML=h;
+}
+function ttTodoToggle(id){
+  const item=DB.items.find(x=>x.id===id);
+  if(item){item.done=!item.done;debSave();renderProgress();renderTTSidebar();}
 }
 function updateTTNav(){
   const lbl=document.getElementById('tt-nav-lbl');
@@ -1125,7 +1215,7 @@ function renderTTMonth(area){
     h+=`<div class="tt-month-cell${isT?' today':''}" onclick="ttMonthClick('${ds}')">
       <div class="tt-month-date">${day}</div>`;
     blocks.slice(0,3).forEach(b=>{
-      const col=getCatColor(b.category);
+      const col=getTTCatColor(b.category);
       h+=`<div class="tt-month-block" style="background:${col.bg};color:${col.text};border-left:2px solid ${col.border}">${slotToTime(b.startSlot)} ${b.label||b.category}</div>`;
     });
     if(blocks.length>3)h+=`<div class="tt-month-more">+${blocks.length-3}개</div>`;
@@ -1195,7 +1285,7 @@ function openTTNewModal(date,s,e){
   document.getElementById('tt-modal-title').textContent='새 블록 추가';
   document.getElementById('tt-modal-time').textContent=`${d.getMonth()+1}/${d.getDate()} ${slotToTime(s)} – ${slotToTime(e)}`;
   document.getElementById('tt-in-label').value='';
-  const cats=getCats();
+  const cats=getTTCats();
   document.getElementById('tt-in-cat').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
   document.getElementById('tt-del-btn').style.display='none';
   document.getElementById('tt-modal').classList.add('open');
@@ -1208,7 +1298,7 @@ function openTTBlockModal(id){
   document.getElementById('tt-modal-title').textContent='블록 편집';
   document.getElementById('tt-modal-time').textContent=`${d.getMonth()+1}/${d.getDate()} ${slotToTime(block.startSlot)} – ${slotToTime(block.endSlot)}`;
   document.getElementById('tt-in-label').value=block.label||'';
-  const cats=getCats();
+  const cats=getTTCats();
   const catSel=document.getElementById('tt-in-cat');
   catSel.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
   catSel.value=block.category;
